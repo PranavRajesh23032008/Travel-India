@@ -5,8 +5,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { confirmPasswordReset } from 'firebase/auth'
 import LoginImage from '../Images/LoginImage.png'
-import { auth } from '../firebase'
-
+import { auth } from "../firebase";
 const Home: NextPage = () => {
 	const router = useRouter()
 	const oobCode = router.query.oobCode as string
