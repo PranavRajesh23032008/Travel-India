@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
 import {
   View,
@@ -9,22 +10,19 @@ import {
   Alert,
 } from "react-native";
 import tw from "tailwind-react-native-classnames";
+import { auth } from "../firebase";
 import LoginImage from "../Images/LoginImage.png";
-import { RESET_PWD_URL } from "@env";
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
-  const handleSendEmail = () => {};
-  const handleRememberPassword = () => {
-    sendPasswordResetEmail(auth, email, {
-      url: String(RESET_PWD_URL),
-    })
+  const [success, setSuccess] = useState(false);
+  const handleSendEmail = () => {
+    sendPasswordResetEmail(auth, email)
       .then(() => {
-        setEmail("");
-        setEmailSent(true);
+        setSuccess(true);
         setTimeout(() => {
-          navigation.replace("/login");
+          navigation.replace("Login");
         }, 5000);
       })
       .catch((error) => {
@@ -40,8 +38,10 @@ const ForgotPasswordScreen = () => {
         } else if (errorCode === "auth/user-not-found") {
           Alert.alert("This user hasn't registered.");
         }
-        console.log(errorCode);
       });
+  };
+  const handleRememberPassword = () => {
+    navigation.replace("Login");
   };
   return (
     <View
@@ -61,10 +61,16 @@ const ForgotPasswordScreen = () => {
         />
         <TouchableOpacity
           onPress={handleSendEmail}
-          className={"bg-[#FB8282] mt-5 p-2 rounded-md w-[270px]"}
+          className={` ${
+            success ? "border-2 border-emerald-400" : "bg-[#FB8282]"
+          } mt-5 p-2 rounded-md w-[270px]`}
         >
-          <Text className={"text-lg mx-auto font-bold text-white"}>
-            Send email
+          <Text
+            className={`${
+              success ? "text-emerald-400" : "text-white"
+            } text-lg mx-auto font-bold`}
+          >
+            {success ? "Email sent" : "Send Email"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

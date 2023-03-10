@@ -20,43 +20,39 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.replace("Home");
-      }
-    });
-  }, [user]);
-
   const handleForgotPassword = () => {
     navigation.navigate("ForgotPassword");
   };
   const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password).catch((error) => {
-      const errorCode = error.code;
-      if (errorCode === "auth/invalid-email") {
-        Alert.alert("That email is invalid.");
-        setEmail("");
-      } else if (errorCode === "auth/user-not-found") {
-        Alert.alert("That email is not registered.");
-        setEmail("");
-      } else if (errorCode === "auth/wrong-password") {
-        Alert.alert("That password is incorrect.");
-        setPassword("");
-      } else if (errorCode === "auth/user-disabled") {
-        Alert.alert("That user has been disabled.");
-        setEmail("");
-        setPassword("");
-      } else if (errorCode === "auth/too-many-requests") {
-        Alert.alert("Too many sign in requests. Try again later!");
-        setEmail("");
-        setPassword("");
-      } else if (errorCode === "auth/internal-error") {
-        Alert.alert("There was an internal error. Try again later!");
-        setEmail("");
-        setPassword("");
-      }
-    });
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        navigation.replace("Home");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        if (errorCode === "auth/invalid-email") {
+          Alert.alert("That email is invalid.");
+          setEmail("");
+        } else if (errorCode === "auth/user-not-found") {
+          Alert.alert("That email is not registered.");
+          setEmail("");
+        } else if (errorCode === "auth/wrong-password") {
+          Alert.alert("That password is incorrect.");
+          setPassword("");
+        } else if (errorCode === "auth/user-disabled") {
+          Alert.alert("That user has been disabled.");
+          setEmail("");
+          setPassword("");
+        } else if (errorCode === "auth/too-many-requests") {
+          Alert.alert("Too many sign in requests. Try again later!");
+          setEmail("");
+          setPassword("");
+        } else if (errorCode === "auth/internal-error") {
+          Alert.alert("There was an internal error. Try again later!");
+          setEmail("");
+          setPassword("");
+        }
+      });
   };
   const handleRedirectToSignup = () => {
     navigation.navigate("Signup");

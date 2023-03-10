@@ -25,7 +25,7 @@ const App = () => {
     >
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={"LoadingScreen"}
+          initialRouteName={"Loading"}
           screenOptions={{
             gestureDirection: "horizontal",
             gestureEnabled: true,

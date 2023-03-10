@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Image } from "react-native";
 import { auth } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
@@ -8,13 +8,15 @@ import { LinearProgress } from "@rneui/base";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      navigation.replace("Home");
-    } else {
-      navigation.replace("Login");
-    }
-  });
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.replace("Home");
+      } else {
+        navigation.replace("Login");
+      }
+    });
+  }, [auth.currentUser]);
   return (
     <View
       className={"bg-white flex flex-col items-center justify-center flex-1"}

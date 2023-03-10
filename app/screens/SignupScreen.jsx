@@ -11,27 +11,13 @@ import {
 import tw from "tailwind-react-native-classnames";
 import LoginImage from "../Images/LoginImage.png";
 import { auth, db } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  updateProfile,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
 const SignupScreen = () => {
-  const user = auth.currentUser;
-
   const navigation = useNavigation();
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.replace("Home");
-      }
-    });
-  }, [user]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const handleBackToLogin = () => {
@@ -39,56 +25,53 @@ const SignupScreen = () => {
   };
   const handleSignup = () => {
     if (name.length !== 0) {
-      if (phoneNumber.length === 10) {
-        if (
-          password === confirmPassword &&
-          password.length !== 0 &&
-          confirmPassword.length !== 0
-        ) {
-          createUserWithEmailAndPassword(auth, email, password)
-            .then((authUser) => {
-              const user = authUser.user;
-              setDoc(doc(db, "users", user.uid), {
-                name: name,
-                email: user?.email,
-                uuid: user?.uid,
-              });
-              updateProfile(user, {
-                displayName: name,
-              });
-            })
-            .catch((error) => {
-              const errorCode = error.code;
-              const errorMessage = error.message;
-              if (errorCode === "auth/email-already-in-use") {
-                Alert.alert("The given email is already in use.");
-                setEmail("");
-              } else if (errorCode === "auth/invalid-email") {
-                Alert.alert("THis email is invalid.");
-                setEmail("");
-              } else if (errorCode === "auth/missing-email") {
-                Alert.alert("Please give a valid email.");
-                setEmail("");
-              } else if (errorCode === "auth/weak-password") {
-                Alert.alert("Password is too weak.");
-                setConfirmPassword("");
-                setPassword("");
-              } else {
-                Alert.alert(errorMessage);
-                setEmail("");
-                setTag("");
-                setConfirmPassword("");
-                setPassword("");
-              }
+      if (
+        password === confirmPassword &&
+        password.length !== 0 &&
+        confirmPassword.length !== 0
+      ) {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((authUser) => {
+            setDoc(doc(db, "users", authUser.user.uid), {
+              name: name,
+              email: email,
+              password: password,
+              uid: authUser.user.uid,
             });
-        } else {
-          Alert.alert("The given passwords do not match.");
-          setConfirmPassword("");
-          setPassword("");
-        }
+            updateProfile(authUser.user, {
+              displayName: name,
+            });
+            navigation.replace("Home");
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            if (errorCode === "auth/email-already-in-use") {
+              Alert.alert("The given email is already in use.");
+              setEmail("");
+            } else if (errorCode === "auth/invalid-email") {
+              Alert.alert("THis email is invalid.");
+              setEmail("");
+            } else if (errorCode === "auth/missing-email") {
+              Alert.alert("Please give a valid email.");
+              setEmail("");
+            } else if (errorCode === "auth/weak-password") {
+              Alert.alert("Password is too weak.");
+              setConfirmPassword("");
+              setPassword("");
+            } else {
+              Alert.alert(errorMessage);
+              setEmail("");
+              setTag("");
+              setConfirmPassword("");
+              setPassword("");
+            }
+            console.log(errorCode);
+          });
       } else {
-        Alert.alert("Please give a valid phone number.");
-        setPhoneNumber("");
+        Alert.alert("The given passwords do not match.");
+        setConfirmPassword("");
+        setPassword("");
       }
     } else {
       Alert.alert("Please give yourself a name!");
@@ -113,39 +96,22 @@ const SignupScreen = () => {
           }
           style={tw`shadow-sm`}
         />
-        <View className={"flex flex-row items-center"}>
-          <TextInput
-            placeholder="Email"
-            value={String(email)}
-            onChangeText={(text) => {
-              setEmail(text);
-              console.log(email.length);
-            }}
-            className={
-              "bg-gray-50 flex-1 mr-1 px-4 py-2 border border-gray-200 rounded-md my-1 "
-            }
-            style={tw`shadow-sm`}
-          />
-          <TextInput
-            keyboardType={"phone-pad"}
-            placeholder="Phone"
-            value={String(phoneNumber)}
-            onChangeText={(text) => {
-              setPhoneNumber(text);
-              console.log(phoneNumber.length);
-            }}
-            className={
-              "bg-gray-50 flex-1 ml-1 px-4 py-2 border border-gray-200 rounded-md my-1"
-            }
-            style={tw`shadow-sm`}
-          />
-        </View>
+        <TextInput
+          placeholder="Email"
+          value={String(email)}
+          onChangeText={(text) => {
+            setEmail(text);
+          }}
+          className={
+            "bg-gray-50  mr-1 px-4 py-2 border border-gray-200 rounded-md my-1 "
+          }
+          style={tw`shadow-sm`}
+        />
         <TextInput
           placeholder="Password"
           value={String(password)}
           onChangeText={(text) => {
             setPassword(text);
-            console.log(password.length);
           }}
           secureTextEntry={true}
           className={
@@ -158,7 +124,6 @@ const SignupScreen = () => {
           value={String(confirmPassword)}
           onChangeText={(text) => {
             setConfirmPassword(text);
-            console.log(confirmPassword.length);
           }}
           secureTextEntry={true}
           className={
@@ -174,9 +139,9 @@ const SignupScreen = () => {
 
         <TouchableOpacity
           onPress={handleSignup}
-          className={"bg-[#FB8282] mt-5 p-2 rounded-md w-[270px]"}
+          className={`bg-[#FB8282] mt-5 p-2 rounded-md w-[270px] `}
         >
-          <Text className={"text-lg mx-auto font-bold text-white"}>
+          <Text className={`text-white text-lg mx-auto font-bold`}>
             Sign up
           </Text>
         </TouchableOpacity>
