@@ -1,19 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Button, Text } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import useUserData from "../hooks/useUserData";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const userData = useUserData();
+
   return (
-    <View className={"flex flex-1 items-center justify-center"}>
+    <View className={"flex-1"}>
       <Button
+        title="Logout"
         onPress={() => {
-          signOut(auth);
+          auth.signOut();
+          AsyncStorage.removeItem("currentUser");
           navigation.replace("Login");
         }}
-        title={"Log out"}
       />
     </View>
   );

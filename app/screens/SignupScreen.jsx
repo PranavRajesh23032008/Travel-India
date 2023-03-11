@@ -41,6 +41,7 @@ const SignupScreen = () => {
             updateProfile(authUser.user, {
               displayName: name,
             });
+            AsyncStorage.setItem("currentUser", JSON.stringify(authUser));
             navigation.replace("Home");
           })
           .catch((error) => {
@@ -66,7 +67,6 @@ const SignupScreen = () => {
               setConfirmPassword("");
               setPassword("");
             }
-            console.log(errorCode);
           });
       } else {
         Alert.alert("The given passwords do not match.");

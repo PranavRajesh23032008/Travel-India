@@ -1,22 +1,34 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Image } from "react-native";
 import { auth } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { onAuthStateChanged } from "firebase/auth";
 import LoginImage from "../Images/LoginImage.png";
 import { LinearProgress } from "@rneui/base";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.replace("Home");
-      } else {
-        navigation.replace("Login");
+    const getData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("currentUser");
+        if (jsonValue != null) {
+          setTimeout(() => {
+            navigation.replace("Home");
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            navigation.replace("Login");
+          }, 2000);
+        }
+      } catch (e) {
+        console.log(e);
       }
-    });
-  }, [auth.currentUser]);
+    };
+    getData();
+  }, []);
+
   return (
     <View
       className={"bg-white flex flex-col items-center justify-center flex-1"}

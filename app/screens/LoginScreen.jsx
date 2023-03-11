@@ -11,21 +11,23 @@ import {
 } from "react-native";
 import tw from "tailwind-react-native-classnames";
 import LoginImage from "../Images/LoginImage.png";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const handleForgotPassword = () => {
     navigation.navigate("ForgotPassword");
   };
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then((user) => {
+        // store the argument user in AsyncStorage
+        AsyncStorage.setItem("currentUser", JSON.stringify(user));
         navigation.replace("Home");
       })
       .catch((error) => {
